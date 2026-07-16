@@ -1,0 +1,52 @@
+<svg
+  [attr.viewBox]="'0 0 ' + viewWidth + ' ' + viewHeight"
+  width="100%"
+  role="img"
+  [attr.aria-label]="type === 'bar' ? 'Gráfico de barras' : 'Gráfico de líneas'"
+>
+  <!-- Línea base -->
+  <line
+    x1="0"
+    [attr.y1]="baselineY"
+    [attr.x2]="viewWidth"
+    [attr.y2]="baselineY"
+    class="axis"
+  />
+
+  @if (type === 'bar') {
+    @for (bar of bars(); track bar.title) {
+      <rect
+        [attr.x]="bar.x"
+        [attr.y]="bar.y"
+        [attr.width]="bar.w"
+        [attr.height]="bar.h"
+        [attr.fill]="color"
+        rx="5"
+      >
+        <title>{{ bar.title }}</title>
+      </rect>
+      @if (showValues) {
+        <text [attr.x]="bar.cx" [attr.y]="bar.valueY" text-anchor="middle" class="chart-value">
+          {{ bar.display }}
+        </text>
+      }
+      @for (row of bar.labelRows; track row.y) {
+        <text [attr.x]="bar.cx" [attr.y]="row.y" text-anchor="middle" class="chart-label">
+          {{ row.text }}
+        </text>
+      }
+    }
+  } @else {
+    <path [attr.d]="linePath()" fill="none" [attr.stroke]="color" stroke-width="2.5" stroke-linejoin="round" />
+    @for (p of linePoints(); track p.title) {
+      <circle [attr.cx]="p.cx" [attr.cy]="p.cy" r="4" [attr.fill]="color">
+        <title>{{ p.title }}</title>
+      </circle>
+      @for (row of p.labelRows; track row.y) {
+        <text [attr.x]="p.cx" [attr.y]="row.y" text-anchor="middle" class="chart-label">
+          {{ row.text }}
+        </text>
+      }
+    }
+  }
+</svg>

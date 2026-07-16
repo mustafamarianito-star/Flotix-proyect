@@ -1,0 +1,159 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+// Tema Flotix — navy + celeste del logo. Definimos un tema claro (por
+// defecto) y uno oscuro que se activa con [data-theme="dark"] en <html>.
+$flotix-light: mat.define-theme(
+  (
+    color: (
+      theme-type: light,
+      primary: mat.$blue-palette,
+      tertiary: mat.$cyan-palette,
+    ),
+    density: (
+      scale: 0,
+    ),
+  )
+);
+
+$flotix-dark: mat.define-theme(
+  (
+    color: (
+      theme-type: dark,
+      primary: mat.$blue-palette,
+      tertiary: mat.$cyan-palette,
+    ),
+    density: (
+      scale: 0,
+    ),
+  )
+);
+
+html {
+  @include mat.all-component-themes($flotix-light);
+}
+
+html[data-theme='dark'] {
+  @include mat.all-component-colors($flotix-dark);
+}
+
+/* ============ Tokens de marca / tema claro ============ */
+:root {
+  // Marca
+  --brand-navy: #1b3a6b;
+  --brand-navy-deep: #16233f;
+  --brand-sky: #4fa8e0;
+  --brand-sky-soft: #7cc3ec;
+
+  // Superficies y texto (tema claro)
+  --bg: #eaeef4;
+  --bg-elevated: #f4f6fa;
+  --surface: #ffffff;
+  --surface-2: #f5f7fb;
+  --text: #16233f;
+  --text-muted: #5c6773;
+  --border: #e2e6ee;
+
+  // Semánticos
+  --primary: #1b3a6b;
+  --accent: #1f76c0;
+  --accent-dark: #175a97;
+  --moss: #2f8f5b;
+  --rust: #c2452a;
+  --warn: #c9861d;
+
+  // Alias legados (usados por componentes existentes) → mapeados al tema
+  --ink: var(--text);
+  --paper: var(--bg);
+  --paper-card: var(--surface);
+  --petrol: #1c4a5e;
+  --slate: var(--text-muted);
+  --line: var(--border);
+
+  --font-mono: 'Roboto Mono', ui-monospace, monospace;
+  --font-brand: 'Sora', 'Roboto', system-ui, sans-serif;
+  --shadow-card: 0 1px 2px rgba(16, 35, 63, 0.05), 0 6px 18px rgba(16, 35, 63, 0.07);
+  --shadow-pop: 0 12px 34px rgba(16, 35, 63, 0.16);
+  --radius: 14px;
+}
+
+/* ============ Tema oscuro ============ */
+:root[data-theme='dark'] {
+  --bg: #0d1524;
+  --bg-elevated: #121d33;
+  --surface: #16233f;
+  --surface-2: #1d2e50;
+  --text: #e8eef7;
+  --text-muted: #9fb0c9;
+  --border: #27395e;
+
+  --primary: #4fa8e0;
+  --accent: #4fa8e0;
+  --accent-dark: #7cc3ec;
+  --moss: #4fce8d;
+  --rust: #f0785a;
+  --warn: #edb44e;
+
+  --petrol: #5fb3cc;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 22px rgba(0, 0, 0, 0.35);
+  --shadow-pop: 0 14px 40px rgba(0, 0, 0, 0.5);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Roboto', system-ui, sans-serif;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-brand);
+  letter-spacing: -0.01em;
+}
+
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  vertical-align: middle;
+}
+
+/* Scrollbar sutil acorde al tema */
+* {
+  scrollbar-color: var(--border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 8px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

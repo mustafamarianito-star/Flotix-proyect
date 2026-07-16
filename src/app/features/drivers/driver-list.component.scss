@@ -1,0 +1,131 @@
+.add-card {
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow-card);
+  padding: 16px 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 160px;
+  }
+
+  button {
+    margin-top: 4px;
+  }
+}
+
+.page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  h1 {
+    font-size: 1.7rem;
+    margin: 0;
+  }
+
+  a {
+    text-decoration: none;
+  }
+}
+
+.eyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--slate);
+  margin-bottom: 6px;
+}
+
+.back-link {
+  display: inline-block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent-dark);
+  text-decoration: none;
+  margin-bottom: 10px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.table-card {
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow-card);
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.sub {
+  color: var(--slate);
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.status {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--moss);
+
+  &::before {
+    content: '●';
+    margin-right: 5px;
+    font-size: 0.6rem;
+  }
+
+  &.inactive {
+    color: var(--slate);
+  }
+}
+
+.actions-col {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.danger {
+  color: var(--rust);
+}
+
+.empty-state {
+  background: var(--paper-card);
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--slate);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+
+  a {
+    text-decoration: none;
+  }
+}

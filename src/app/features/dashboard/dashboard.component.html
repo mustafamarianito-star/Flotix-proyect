@@ -1,0 +1,201 @@
+<header class="page-head">
+  <div>
+    <span class="eyebrow">Panel general</span>
+    <h1>Dashboard</h1>
+  </div>
+
+  <div class="head-actions">
+    <div class="month-nav" role="group" aria-label="Navegar meses">
+      <button class="nav-btn" (click)="prevMonth()" aria-label="Mes anterior">
+        <span class="material-symbols-rounded">chevron_left</span>
+      </button>
+      <span class="month-label">{{ selectedMonthLabel() }}</span>
+      <button
+        class="nav-btn"
+        (click)="nextMonth()"
+        [disabled]="!canGoNext()"
+        aria-label="Mes siguiente"
+      >
+        <span class="material-symbols-rounded">chevron_right</span>
+      </button>
+    </div>
+
+    <a routerLink="/combustible/nuevo" class="btn-primary">
+      <span class="material-symbols-rounded">add</span>
+      Registrar movimiento
+    </a>
+  </div>
+</header>
+
+<section class="kpi-grid">
+  <mat-card class="kpi income">
+    <span class="kpi-icon"><span class="material-symbols-rounded">trending_up</span></span>
+    <span class="kpi-label">Ingresos del mes</span>
+    <span class="kpi-value">$ {{ monthIncome() | number: '1.0-0' }}</span>
+  </mat-card>
+
+  <mat-card class="kpi expense">
+    <span class="kpi-icon"><span class="material-symbols-rounded">trending_down</span></span>
+    <span class="kpi-label">Gastos del mes</span>
+    <span class="kpi-value">$ {{ monthExpenses() | number: '1.0-0' }}</span>
+    <span class="kpi-sub">Combustible + gastos extra</span>
+  </mat-card>
+
+  <mat-card class="kpi" [class.result-pos]="monthResult() >= 0" [class.result-neg]="monthResult() < 0">
+    <span class="kpi-icon"><span class="material-symbols-rounded">account_balance_wallet</span></span>
+    <span class="kpi-label">Resultado del mes</span>
+    <span class="kpi-value">$ {{ monthResult() | number: '1.0-0' }}</span>
+    <span class="kpi-sub">{{ monthResult() >= 0 ? 'Ganancia' : 'Pérdida' }}</span>
+  </mat-card>
+
+  <mat-card class="kpi trips">
+    <span class="kpi-icon"><span class="material-symbols-rounded">route</span></span>
+    <span class="kpi-label">Viajes del mes</span>
+    <span class="kpi-value">{{ monthTrips() }}</span>
+    <span class="kpi-sub">Rendiciones del período</span>
+  </mat-card>
+
+  <mat-card class="kpi">
+    <span class="kpi-icon"><span class="material-symbols-rounded">local_gas_station</span></span>
+    <span class="kpi-label">Litros cargados</span>
+    <span class="kpi-value">{{ monthLitersLoaded() | number: '1.0-0' }} L</span>
+    <span class="kpi-sub">En el mes</span>
+  </mat-card>
+
+  <mat-card class="kpi">
+    <span class="kpi-icon"><span class="material-symbols-rounded">water_drop</span></span>
+    <span class="kpi-label">Balance de litros</span>
+    <span class="kpi-value">{{ balance().totalLiters | number: '1.0-0' }} L</span>
+    <span class="kpi-sub">Histórico acumulado</span>
+  </mat-card>
+</section>
+
+<div class="zoom-toolbar">
+  <span class="zoom-label">
+    <span class="material-symbols-rounded">zoom_in</span>
+    Tamaño de gráficos
+  </span>
+  <div class="zoom-controls">
+    <button
+      type="button"
+      class="nav-btn"
+      (click)="decreaseChartScale()"
+      [disabled]="!canDecreaseChartScale()"
+      aria-label="Achicar gráficos"
+    >
+      <span class="material-symbols-rounded">remove</span>
+    </button>
+    <button type="button" class="zoom-value" (click)="resetChartScale()" matTooltip="Restablecer">
+      {{ chartScale() * 100 | number: '1.0-0' }}%
+    </button>
+    <button
+      type="button"
+      class="nav-btn"
+      (click)="increaseChartScale()"
+      [disabled]="!canIncreaseChartScale()"
+      aria-label="Agrandar gráficos"
+    >
+      <span class="material-symbols-rounded">add</span>
+    </button>
+  </div>
+</div>
+
+<div class="charts-zoom-wrap" [style.zoom]="chartScale()">
+  <section class="chart-card income-chart">
+    <div class="chart-head">
+      <div>
+        <h2>Ingresos mensuales</h2>
+        <span class="chart-sub">Últimos 6 meses hasta {{ selectedMonthLabel() }}</span>
+      </div>
+      <span class="material-symbols-rounded chart-badge">payments</span>
+    </div>
+    <app-mini-chart
+      [data]="incomeByMonth()"
+      type="bar"
+      color="var(--moss)"
+      [showValues]="true"
+      valuePrefix="$ "
+      [viewWidth]="900"
+    ></app-mini-chart>
+  </section>
+
+  <section class="charts-grid">
+    <mat-card class="chart-card">
+      <div class="chart-head">
+        <h2>Viajes por camión</h2>
+        <span class="material-symbols-rounded chart-badge">local_shipping</span>
+      </div>
+      @if (tripsPerVehicle().length) {
+        <app-mini-chart [data]="tripsPerVehicle()" type="bar" color="var(--accent)" [showValues]="true"></app-mini-chart>
+      } @else {
+        <p class="empty">Sin viajes registrados en {{ selectedMonthLabel() }}.</p>
+      }
+    </mat-card>
+
+    <mat-card class="chart-card">
+      <div class="chart-head">
+        <h2>Viajes por chofer</h2>
+        <span class="material-symbols-rounded chart-badge">badge</span>
+      </div>
+      @if (tripsPerDriver().length) {
+        <app-mini-chart [data]="tripsPerDriver()" type="bar" color="var(--petrol)" [showValues]="true"></app-mini-chart>
+      } @else {
+        <p class="empty">Sin viajes registrados en {{ selectedMonthLabel() }}.</p>
+      }
+    </mat-card>
+  </section>
+</div>
+
+<section class="recent-card-wrap">
+  <mat-card class="recent-card">
+    <div class="recent-head">
+      <h2>Vencimientos</h2>
+      <a routerLink="/vehiculos">Ver vehículos →</a>
+    </div>
+    @for (item of upcomingExpiries(); track item.label) {
+      <div class="recent-row">
+        <span
+          class="material-symbols-rounded"
+          [class.consumo]="item.status === 'vencido'"
+          [class.warn-icon]="item.status === 'proximo'"
+        >
+          {{ item.status === 'vencido' ? 'error' : 'warning' }}
+        </span>
+        <div class="recent-info">
+          <span class="recent-title">{{ item.label }}</span>
+          <span class="recent-sub">{{ item.date }}</span>
+        </div>
+        <span class="recent-liters" [class.danger-text]="item.status === 'vencido'">
+          {{ item.status === 'vencido' ? 'Vencido hace ' + (-item.daysLeft) + ' d' : 'Vence en ' + item.daysLeft + ' d' }}
+        </span>
+      </div>
+    } @empty {
+      <p class="empty">Sin vencimientos próximos en los próximos 30 días.</p>
+    }
+  </mat-card>
+</section>
+
+<section class="recent-card-wrap">
+  <mat-card class="recent-card">
+    <div class="recent-head">
+      <h2>Últimos movimientos</h2>
+      <a routerLink="/combustible">Ver todos →</a>
+    </div>
+    @for (m of recent(); track m.id) {
+      <div class="recent-row">
+        <span class="material-symbols-rounded" [class.consumo]="m.movementKind === 'consumo'">
+          {{ m.movementKind === 'carga' ? 'arrow_downward' : 'arrow_upward' }}
+        </span>
+        <div class="recent-info">
+          <span class="recent-title">
+            {{ m.movementKind === 'carga' ? 'Carga' : 'Consumo' }} de {{ m.type }}
+          </span>
+          <span class="recent-sub">{{ m.date }} · {{ m.vehicle || 'Sin vehículo' }}</span>
+        </div>
+        <span class="recent-liters">{{ m.liters }} L</span>
+      </div>
+    } @empty {
+      <p class="empty">Todavía no registraste movimientos.</p>
+    }
+  </mat-card>
+</section>

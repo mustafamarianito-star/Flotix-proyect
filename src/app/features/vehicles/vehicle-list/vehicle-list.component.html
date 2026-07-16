@@ -1,0 +1,69 @@
+<header class="page-head">
+  <div>
+    <a routerLink="/dashboard" class="back-link">← Volver al dashboard</a>
+    <span class="eyebrow">Flota · {{ vehicles().length }} vehículos</span>
+    <h1>Vehículos</h1>
+  </div>
+  <a routerLink="/vehiculos/nuevo" mat-flat-button color="primary">
+    <span class="material-symbols-rounded">add</span>
+    Dar de alta
+  </a>
+</header>
+
+@if (vehicles().length > 0) {
+  <div class="table-card">
+    <table mat-table [dataSource]="vehicles()">
+      <ng-container matColumnDef="label">
+        <th mat-header-cell *matHeaderCellDef>Vehículo</th>
+        <td mat-cell *matCellDef="let v">
+          <div class="name">{{ v.label }}</div>
+          <div class="sub">{{ v.plate }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="brand">
+        <th mat-header-cell *matHeaderCellDef>Marca / Modelo</th>
+        <td mat-cell *matCellDef="let v">{{ v.brand }} {{ v.model }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>Tipo</th>
+        <td mat-cell *matCellDef="let v">{{ v.type }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="year">
+        <th mat-header-cell *matHeaderCellDef>Año</th>
+        <td mat-cell *matCellDef="let v" class="mono">{{ v.year || '—' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let v">
+          <span class="status" [class.inactive]="v.status === 'inactivo'">
+            {{ v.status === 'activo' ? 'Activo' : 'Inactivo' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="actions-col">Acciones</th>
+        <td mat-cell *matCellDef="let v" class="actions-col">
+          <a [routerLink]="['/vehiculos', v.id, 'editar']" mat-icon-button matTooltip="Editar">
+            <span class="material-symbols-rounded">edit</span>
+          </a>
+          <button mat-icon-button matTooltip="Dar de baja" (click)="remove(v.id, v.label)">
+            <span class="material-symbols-rounded danger">delete</span>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+} @else {
+  <div class="empty-state">
+    <p>Todavía no diste de alta ningún vehículo.</p>
+    <a routerLink="/vehiculos/nuevo" mat-flat-button color="primary">Dar de alta el primero</a>
+  </div>
+}

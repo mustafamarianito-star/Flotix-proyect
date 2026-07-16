@@ -1,0 +1,142 @@
+<header class="page-head">
+  <div>
+    <a routerLink="/dashboard" class="back-link">← Volver al dashboard</a>
+    <span class="eyebrow">Rendiciones · {{ rows().length }}</span>
+    <h1>Rendiciones</h1>
+  </div>
+  <div class="head-actions">
+    <button mat-stroked-button class="csv-btn" (click)="exportCsv()">CSV</button>
+    <button mat-flat-button color="primary" [disabled]="exportingAll()" (click)="exportAllExcel()">
+      @if (exportingAll()) {
+        <span class="material-symbols-rounded spin">progress_activity</span>
+      } @else {
+        <span class="material-symbols-rounded">grid_on</span>
+      }
+      Exportar Excel (con gráficos)
+    </button>
+    <a routerLink="/rendiciones/nueva" mat-flat-button color="primary">
+      <span class="material-symbols-rounded">add</span>
+      Nueva rendición
+    </a>
+  </div>
+</header>
+
+<div class="filters">
+  <button class="chip" [class.active]="statusFilter() === null" (click)="setStatusFilter(null)">
+    Todas
+  </button>
+  <button class="chip" [class.active]="statusFilter() === 'pendiente'" (click)="setStatusFilter('pendiente')">
+    Pendientes
+  </button>
+  <button class="chip" [class.active]="statusFilter() === 'aprobada'" (click)="setStatusFilter('aprobada')">
+    Aprobadas
+  </button>
+  <button class="chip" [class.active]="statusFilter() === 'pagada'" (click)="setStatusFilter('pagada')">
+    Pagadas
+  </button>
+</div>
+
+@if (rows().length > 0) {
+  <div class="table-card">
+    <table mat-table [dataSource]="rows()">
+      <ng-container matColumnDef="period">
+        <th mat-header-cell *matHeaderCellDef>Período</th>
+        <td mat-cell *matCellDef="let row" class="mono">
+          {{ row.rendicion.periodStart }} → {{ row.rendicion.periodEnd }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="vehicle">
+        <th mat-header-cell *matHeaderCellDef>Vehículo</th>
+        <td mat-cell *matCellDef="let row">{{ row.rendicion.vehicleLabel || '—' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="driver">
+        <th mat-header-cell *matHeaderCellDef>Chofer</th>
+        <td mat-cell *matCellDef="let row">{{ row.driverName }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="fuel">
+        <th mat-header-cell *matHeaderCellDef>Combustible</th>
+        <td mat-cell *matCellDef="let row" class="mono">
+          $ {{ row.fuelSpent | number: '1.0-0' }}
+          <span class="sub">({{ row.fuelLiters | number: '1.0-0' }} L)</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="efficiency">
+        <th mat-header-cell *matHeaderCellDef>Rendimiento</th>
+        <td mat-cell *matCellDef="let row" class="mono">
+          @if (row.litersPer100km != null) {
+            {{ row.litersPer100km | number: '1.1-1' }} L/100km
+          } @else {
+            <span class="sub">—</span>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="extras">
+        <th mat-header-cell *matHeaderCellDef>Gastos extra</th>
+        <td mat-cell *matCellDef="let row" class="mono">$ {{ row.extrasTotal | number: '1.0-0' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="incidents">
+        <th mat-header-cell *matHeaderCellDef>Siniestros</th>
+        <td mat-cell *matCellDef="let row">
+          @if (row.rendicion.incidents.length > 0) {
+            <span class="badge warn">{{ row.rendicion.incidents.length }}</span>
+          } @else {
+            <span class="sub">—</span>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let row">
+          <button class="status-badge" [class]="row.rendicion.status" [matMenuTriggerFor]="statusMenu">
+            {{ row.rendicion.status }}
+            <span class="material-symbols-rounded">expand_more</span>
+          </button>
+          <mat-menu #statusMenu="matMenu">
+            <button mat-menu-item (click)="setStatus(row.rendicion.id, 'pendiente')">Pendiente</button>
+            <button mat-menu-item (click)="setStatus(row.rendicion.id, 'aprobada')">Aprobada</button>
+            <button mat-menu-item (click)="setStatus(row.rendicion.id, 'pagada')">Pagada</button>
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="actions-col">Acciones</th>
+        <td mat-cell *matCellDef="let row" class="actions-col">
+          <button
+            mat-icon-button
+            matTooltip="Exportar a Excel (con gráficos y facturas)"
+            [disabled]="exportingId() === row.rendicion.id"
+            (click)="exportExcel(row.rendicion.id)"
+          >
+            @if (exportingId() === row.rendicion.id) {
+              <span class="material-symbols-rounded spin">progress_activity</span>
+            } @else {
+              <span class="material-symbols-rounded">grid_on</span>
+            }
+          </button>
+          <a [routerLink]="['/rendiciones', row.rendicion.id, 'editar']" mat-icon-button matTooltip="Editar">
+            <span class="material-symbols-rounded">edit</span>
+          </a>
+          <button mat-icon-button matTooltip="Eliminar" (click)="remove(row.rendicion.id)">
+            <span class="material-symbols-rounded danger">delete</span>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+} @else {
+  <div class="empty-state">
+    <p>Todavía no cargaste ninguna rendición.</p>
+    <a routerLink="/rendiciones/nueva" mat-flat-button color="primary">Crear la primera</a>
+  </div>
+}

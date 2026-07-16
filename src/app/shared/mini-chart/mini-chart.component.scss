@@ -1,0 +1,22 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.axis {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.chart-label {
+  font-size: 11px;
+  fill: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.chart-value {
+  font-size: 12px;
+  font-weight: 700;
+  fill: var(--text);
+  font-family: var(--font-mono);
+}

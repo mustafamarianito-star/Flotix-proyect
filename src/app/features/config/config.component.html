@@ -1,0 +1,69 @@
+<header class="page-head">
+  <div>
+    <a routerLink="/dashboard" class="back-link">← Volver al dashboard</a>
+    <span class="eyebrow">Configuración</span>
+    <h1>Preferencias y datos</h1>
+  </div>
+</header>
+
+<mat-card class="block">
+  <h2>Apariencia</h2>
+  <p class="hint">Elegí cómo se ve Flotix. La preferencia se guarda en este dispositivo.</p>
+  <div class="theme-toggle" role="group" aria-label="Tema de la aplicación">
+    <button
+      type="button"
+      class="theme-option"
+      [class.active]="theme() === 'light'"
+      (click)="setTheme('light')"
+    >
+      <span class="material-symbols-rounded">light_mode</span>
+      Claro
+    </button>
+    <button
+      type="button"
+      class="theme-option"
+      [class.active]="theme() === 'dark'"
+      (click)="setTheme('dark')"
+    >
+      <span class="material-symbols-rounded">dark_mode</span>
+      Oscuro
+    </button>
+  </div>
+</mat-card>
+
+<mat-card class="block">
+  <h2>Descargar respaldo</h2>
+  <p class="hint">
+    Descarga un archivo con todos los datos de la app (combustible,
+    vehículos, choferes y rendiciones) para guardarlo en un lugar seguro.
+    El proyecto gratuito de Supabase no tiene backups automáticos, así que
+    conviene bajar uno de estos periódicamente. Nota: este archivo incluye
+    las facturas adjuntas (guardadas como datos en la rendición).
+  </p>
+  <button mat-flat-button color="primary" (click)="downloadBackup()">
+    <span class="material-symbols-rounded">download</span>
+    Descargar backup
+  </button>
+</mat-card>
+
+<mat-card class="block">
+  <h2>Restaurar un respaldo</h2>
+  <p class="hint">
+    Subí un archivo de backup descargado previamente. Esto <strong>agrega</strong>
+    los registros del archivo a la base de Supabase compartida (no borra los
+    datos existentes).
+  </p>
+  <label class="upload-btn">
+    <span class="material-symbols-rounded">upload</span>
+    {{ importing() ? 'Restaurando…' : 'Elegir archivo de backup' }}
+    <input type="file" accept="application/json" (change)="onFileSelected($event)" hidden />
+  </label>
+
+  @if (importResult() === 'ok') {
+    <p class="feedback ok">Backup restaurado. Recargando la app…</p>
+  } @else if (importResult() === 'error') {
+    <p class="feedback error">
+      El archivo no tiene el formato esperado de un backup de esta app.
+    </p>
+  }
+</mat-card>

@@ -1,0 +1,250 @@
+<header class="page-head">
+  <div>
+    <a routerLink="/rendiciones" class="back-link">← Volver al listado</a>
+    <span class="eyebrow">Ficha de rendición</span>
+    <h1>{{ isEditMode() ? 'Modificar rendición' : 'Nueva rendición' }}</h1>
+  </div>
+</header>
+
+<form class="form-card" [formGroup]="form" (ngSubmit)="save()">
+  <section class="block">
+    <h2>Datos generales</h2>
+    <div class="grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Vehículo</mat-label>
+        <mat-select formControlName="vehicleLabel">
+          @for (v of vehicles(); track v.id) {
+            <mat-option [value]="v.label">{{ v.label }}</mat-option>
+          }
+        </mat-select>
+        @if (vehicles().length === 0) {
+          <mat-hint>No hay vehículos — <a routerLink="/vehiculos/nuevo">dá de alta uno</a>.</mat-hint>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Chofer</mat-label>
+        <mat-select formControlName="driverId">
+          @for (d of drivers(); track d.id) {
+            <mat-option [value]="d.id">{{ d.name }}</mat-option>
+          }
+        </mat-select>
+        @if (drivers().length === 0) {
+          <mat-hint>No hay choferes — <a routerLink="/choferes">agregá uno</a>.</mat-hint>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Desde</mat-label>
+        <input matInput [matDatepicker]="pickerStart" formControlName="periodStart" />
+        <mat-datepicker-toggle matIconSuffix [for]="pickerStart"></mat-datepicker-toggle>
+        <mat-datepicker #pickerStart></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Hasta</mat-label>
+        <input matInput [matDatepicker]="pickerEnd" formControlName="periodEnd" />
+        <mat-datepicker-toggle matIconSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+        <mat-datepicker #pickerEnd></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="pendiente">Pendiente</mat-option>
+          <mat-option value="aprobada">Aprobada</mat-option>
+          <mat-option value="pagada">Pagada</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Ingreso facturado (opcional)</mat-label>
+        <span matTextPrefix>$&nbsp;</span>
+        <input matInput type="number" formControlName="income" placeholder="0" />
+        <mat-hint>Lo que se cobró por este viaje. Alimenta los ingresos del dashboard.</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="span-2">
+        <mat-label>Notas (opcional)</mat-label>
+        <textarea matInput formControlName="notes" rows="2"></textarea>
+      </mat-form-field>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Combustible y rendimiento del período</h2>
+    <div class="fuel-summary">
+      <div>
+        <span class="label">Litros cargados</span>
+        <span class="value">{{ fuelPreview().liters | number: '1.0-0' }} L</span>
+      </div>
+      <div>
+        <span class="label">Gasto en combustible</span>
+        <span class="value">$ {{ fuelPreview().spent | number: '1.0-0' }}</span>
+      </div>
+      <div>
+        <span class="label">Cargas registradas</span>
+        <span class="value">{{ fuelPreview().movementCount }}</span>
+      </div>
+    </div>
+    <p class="hint">
+      Se calcula automáticamente a partir de las cargas registradas en
+      "Combustible" para este vehículo, dentro del período elegido.
+    </p>
+
+    <div class="grid odometer-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Odómetro inicial (km, opcional)</mat-label>
+        <input matInput type="number" formControlName="odometerStart" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Odómetro final (km, opcional)</mat-label>
+        <input matInput type="number" formControlName="odometerEnd" />
+      </mat-form-field>
+    </div>
+
+    @if (efficiencyPreview().km > 0) {
+      <div class="fuel-summary">
+        <div>
+          <span class="label">Km recorridos</span>
+          <span class="value">{{ efficiencyPreview().km | number: '1.0-0' }} km</span>
+        </div>
+        <div>
+          <span class="label">Rendimiento estimado</span>
+          <span class="value">
+            {{ efficiencyPreview().litersPer100km | number: '1.1-1' }} L/100km
+          </span>
+        </div>
+      </div>
+      <p class="hint">
+        Rendimiento estimado: compara litros cargados contra km recorridos en
+        el mismo período — es una aproximación, no un consumo medido real.
+      </p>
+    }
+  </section>
+
+  <section class="block">
+    <div class="block-head">
+      <h2>Gastos extra</h2>
+      <button type="button" mat-stroked-button (click)="addExpense()">
+        <span class="material-symbols-rounded">add</span>
+        Agregar gasto
+      </button>
+    </div>
+
+    @if (extraExpenses.length === 0) {
+      <p class="hint">Sin gastos extra cargados (peajes, viáticos, reparaciones, etc.).</p>
+    }
+
+    <div formArrayName="extraExpenses" class="rows">
+      @for (expense of extraExpenses.controls; track expense; let i = $index) {
+        <div class="row" [formGroupName]="i">
+          <mat-form-field appearance="outline">
+            <mat-label>Descripción</mat-label>
+            <input matInput formControlName="description" placeholder="Ej. Peaje ruta 9" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="amount-field">
+            <mat-label>Monto</mat-label>
+            <span matTextPrefix>$&nbsp;</span>
+            <input matInput type="number" formControlName="amount" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="date-field">
+            <mat-label>Fecha</mat-label>
+            <input matInput [matDatepicker]="pickerExpense" formControlName="date" />
+            <mat-datepicker-toggle matIconSuffix [for]="pickerExpense"></mat-datepicker-toggle>
+            <mat-datepicker #pickerExpense></mat-datepicker>
+          </mat-form-field>
+          <button type="button" mat-icon-button matTooltip="Quitar" (click)="removeExpense(i)">
+            <span class="material-symbols-rounded danger">delete</span>
+          </button>
+        </div>
+      }
+    </div>
+
+    @if (extraExpenses.length > 0) {
+      <p class="total-line">Total gastos extra: <strong>$ {{ extrasTotal() | number: '1.0-0' }}</strong></p>
+    }
+  </section>
+
+  <section class="block">
+    <div class="block-head">
+      <h2>Siniestros durante el viaje</h2>
+      <button type="button" mat-stroked-button (click)="addIncident()">
+        <span class="material-symbols-rounded">add</span>
+        Notificar siniestro
+      </button>
+    </div>
+
+    @if (incidents.length === 0) {
+      <p class="hint">Sin siniestros notificados para este período.</p>
+    }
+
+    <div formArrayName="incidents" class="rows">
+      @for (incident of incidents.controls; track incident; let i = $index) {
+        <div class="row" [formGroupName]="i">
+          <mat-form-field appearance="outline">
+            <mat-label>Descripción</mat-label>
+            <input matInput formControlName="description" placeholder="Ej. Pinchadura en ruta 34" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="date-field">
+            <mat-label>Fecha</mat-label>
+            <input matInput [matDatepicker]="pickerIncident" formControlName="date" />
+            <mat-datepicker-toggle matIconSuffix [for]="pickerIncident"></mat-datepicker-toggle>
+            <mat-datepicker #pickerIncident></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="severity-field">
+            <mat-label>Gravedad</mat-label>
+            <mat-select formControlName="severity">
+              @for (s of severities; track s) {
+                <mat-option [value]="s">{{ s }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <button type="button" mat-icon-button matTooltip="Quitar" (click)="removeIncident(i)">
+            <span class="material-symbols-rounded danger">delete</span>
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="block-head">
+      <h2>Facturas adjuntas</h2>
+      <label class="upload-btn">
+        <span class="material-symbols-rounded">attach_file</span>
+        {{ uploading() ? 'Subiendo…' : 'Adjuntar archivo' }}
+        <input type="file" multiple accept="image/*,application/pdf" (change)="onFilesSelected($event)" hidden />
+      </label>
+    </div>
+
+    @if (attachments().length === 0) {
+      <p class="hint">Sin facturas adjuntas todavía. Podés subir fotos o PDFs.</p>
+    } @else {
+      <ul class="attachment-list">
+        @for (a of attachments(); track a.id) {
+          <li>
+            <span class="material-symbols-rounded">description</span>
+            <a [href]="a.dataUrl" target="_blank" rel="noopener">{{ a.fileName }}</a>
+            <span class="sub">{{ a.sizeKb }} KB</span>
+            <button type="button" mat-icon-button matTooltip="Quitar" (click)="removeAttachment(a.id)">
+              <span class="material-symbols-rounded danger">close</span>
+            </button>
+          </li>
+        }
+      </ul>
+      <p class="hint">
+        Los archivos se guardan en el navegador (localStorage). Para uso
+        intensivo con muchas facturas grandes, conviene migrar esto a un
+        almacenamiento en la nube más adelante.
+      </p>
+    }
+  </section>
+
+  <div class="form-actions">
+    <button type="button" mat-stroked-button (click)="cancel()">Cancelar</button>
+    <button type="submit" mat-flat-button color="primary">
+      {{ isEditMode() ? 'Guardar cambios' : 'Crear rendición' }}
+    </button>
+  </div>
+</form>

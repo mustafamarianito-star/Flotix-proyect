@@ -1,0 +1,69 @@
+<header class="page-head">
+  <div>
+    <span class="eyebrow">Ficha de vehículo</span>
+    <h1>{{ isEditMode() ? 'Modificar vehículo' : 'Dar de alta vehículo' }}</h1>
+  </div>
+  <a routerLink="/vehiculos" class="btn-secondary">← Volver al listado</a>
+</header>
+
+<form class="form-card" [formGroup]="form" (ngSubmit)="save()">
+  <div class="grid">
+    <mat-form-field appearance="outline">
+      <mat-label>Patente</mat-label>
+      <input matInput formControlName="plate" placeholder="Ej. ABC-123" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo de vehículo</mat-label>
+      <mat-select formControlName="type">
+        @for (t of vehicleTypes; track t) {
+          <mat-option [value]="t">{{ t }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Marca</mat-label>
+      <input matInput formControlName="brand" placeholder="Ej. Mercedes-Benz" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Modelo</mat-label>
+      <input matInput formControlName="model" placeholder="Ej. Actros" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Año</mat-label>
+      <input matInput type="number" formControlName="year" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select formControlName="status">
+        <mat-option value="activo">Activo</mat-option>
+        <mat-option value="inactivo">Inactivo</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Vencimiento del seguro (opcional)</mat-label>
+      <input matInput [matDatepicker]="pickerInsurance" formControlName="insuranceExpiry" />
+      <mat-datepicker-toggle matIconSuffix [for]="pickerInsurance"></mat-datepicker-toggle>
+      <mat-datepicker #pickerInsurance></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Vencimiento de VTV (opcional)</mat-label>
+      <input matInput [matDatepicker]="pickerVtv" formControlName="vtvExpiry" />
+      <mat-datepicker-toggle matIconSuffix [for]="pickerVtv"></mat-datepicker-toggle>
+      <mat-datepicker #pickerVtv></mat-datepicker>
+    </mat-form-field>
+  </div>
+
+  <div class="form-actions">
+    <button type="button" mat-stroked-button (click)="cancel()">Cancelar</button>
+    <button type="submit" mat-flat-button color="primary">
+      {{ isEditMode() ? 'Guardar cambios' : 'Dar de alta' }}
+    </button>
+  </div>
+</form>

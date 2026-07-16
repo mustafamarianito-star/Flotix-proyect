@@ -1,0 +1,51 @@
+<div class="login-scene">
+  <section class="brand-panel">
+    <div class="brand-inner">
+      <div class="brand-lockup">
+        <img src="assets/flotix-isotipo-mono-white.svg" alt="" class="brand-iso" />
+        <span class="brand-word">Flotix</span>
+      </div>
+      <h1 class="brand-title">Gestión de flota, clara y compartida.</h1>
+      <p class="brand-sub">
+        Combustible, vehículos, choferes y rendiciones de tu empresa de
+        transporte, en un solo lugar y sincronizado para todo el equipo.
+      </p>
+      <ul class="brand-features">
+        <li><span class="material-symbols-rounded">local_gas_station</span> Cargas y consumos con balance de litros en vivo</li>
+        <li><span class="material-symbols-rounded">receipt_long</span> Rendiciones con gastos, ingresos e incidentes</li>
+        <li><span class="material-symbols-rounded">insights</span> Dashboard con viajes, ingresos e historial</li>
+      </ul>
+    </div>
+    <span class="brand-watermark" aria-hidden="true">
+      <img src="assets/flotix-isotipo-mono-white.svg" alt="" />
+    </span>
+  </section>
+
+  <section class="access-panel">
+    <div class="login-card">
+      <img src="assets/flotix-app-icon-square.svg" alt="Flotix" class="card-logo" />
+      <span class="eyebrow">Bienvenido</span>
+      <h2>Iniciá sesión</h2>
+      <p class="subtitle">Accedé con tu cuenta de Google para continuar.</p>
+
+      <button class="google-btn" [disabled]="loading()" (click)="loginWithGoogle()">
+        @if (loading()) {
+          <span class="material-symbols-rounded spin">progress_activity</span>
+          Conectando…
+        } @else {
+          <span class="g-badge">G</span>
+          Iniciar sesión con Google
+        }
+      </button>
+
+      @if (errorMessage()) {
+        <p class="error-msg">
+          <span class="material-symbols-rounded">error</span>
+          {{ errorMessage() }}
+        </p>
+      }
+
+      <p class="footnote">Los datos se guardan en la base compartida del equipo.</p>
+    </div>
+  </section>
+</div>
