@@ -29,6 +29,11 @@ export class RendicionListComponent {
   private readonly rendicionService = inject(RendicionService);
   private readonly driverService = inject(DriverService);
 
+  // URL del dashboard de Looker Studio con las métricas de rendiciones.
+  // Reemplazá con la URL de tu dashboard: https://lookerstudio.google.com/reporting/{REPORT_ID}
+  // Ver documentation/Integracion-Looker-Studio.md para crear el dashboard.
+  readonly lookerUrl = 'https://lookerstudio.google.com/reporting/REEMPLAZA-CON-TU-REPORT-ID';
+
   readonly displayedColumns = [
     'period',
     'vehicle',

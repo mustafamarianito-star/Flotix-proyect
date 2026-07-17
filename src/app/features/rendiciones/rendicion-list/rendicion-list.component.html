@@ -5,9 +5,9 @@
     <h1>Rendiciones</h1>
   </div>
   <div class="head-actions">
-    <a href="https://lookerstudio.google.com/" target="_blank" mat-stroked-button class="looker-btn">
+    <a [href]="lookerUrl" target="_blank" mat-stroked-button class="looker-btn">
       <span class="material-symbols-rounded">analytics</span>
-      Ver en Looker Studio
+      Ver reportes en Looker Studio
     </a>
     <a routerLink="/rendiciones/nueva" mat-flat-button color="primary">
       <span class="material-symbols-rounded">add</span>
